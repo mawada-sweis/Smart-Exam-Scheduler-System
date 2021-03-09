@@ -1,214 +1,172 @@
 #include <iostream>
-#include <string>
 #include <queue>
 #include <vector>
+#include <random>
 
 using namespace std;
 #define length 10
 
 struct exam
 {
-	int value_ordering;
-	string time,
-		hole;
-	exam* next;
-	queue<string> domain;
-	exam(string time = "un defined",
-		string hole = "un defined") {
-		this->time = time;
-		this->hole = hole;
-		this->next = nullptr;
-		this->value_ordering = 12;
+	int domain_value,
+		exam_order,
+		time;
+	char hole;
+	queue<int> time_domain;
+	queue<char> hole_domain;
+	
+	exam() {
+		this->time = 0;
+		this->hole = ' ';
+		this->exam_order = 0;
+
+		time_domain.push(1);
+		time_domain.push(2);
+		time_domain.push(3);
+		time_domain.push(4);
+
+		hole_domain.push('A');
+		hole_domain.push('B');
+		hole_domain.push('C');
+
+		this->domain_value = time_domain.size()*hole_domain.size();
 	}
+	
+	template<typename T>
+	T random(vector<exam> const &v)
+	{
+		//auto it = v.cbegin();
+		//exam random = v.cbegin() + (rand() % (v.end() - v.cbegin() + 1));
+		//int random = rand() % v.size();
+
+		//return *(it + random);
+	}
+	
+	//template <typename v>
+	//v backtracking_1(vector<exam> graph_1) {
+	//	//G1: 1 3     G2: 4 9 10      G3: 2 5 6 7 8
+
+	//	return random(graph_1);
+	//}
+
 };
 
-void print_domain(exam e, int i) {
-	cout << "Exam (" << i << ") ->\t";
-	while (!e.domain.empty())
-	{
-		cout << e.domain.front()<< "\t";
-		e.domain.pop();
-	}
-	cout << endl;
-}
-
-void print_value(exam e, int i) {
-	cout << "Exam (" << i << ") -> " << e.value_ordering;
-	cout << endl;
-}
-
-void update_domain(exam *E)
-{
-	for (size_t i = 0; i <length; i++)
-	{
-		switch (i + 1)
+struct graph {
+	vector<exam> graph_1,
+		graph_2,
+		graph_3;
+	
+	void update_queue(exam* E) {
+		for (int j = 0; j < length; j++)
 		{
-			case 1:
-			case 4:
-				for (size_t j = 0; j <3; j++)
-				{
-					for (size_t c = 65; c <68; c += 2)
-					{
-						string s = "t" + to_string(j + 1) + "," + char(c);
-						E[i].domain.push(s);
-					}
-				}
-				break;
+			switch (j) {
+			case 0:
 			case 2:
-			case 5:
-			case 6:
-				for (size_t j = 0; j < 4; j++)
-				{
-					for (size_t c = 65; c < 68; c++)
-					{
-						string s = "t" + to_string(j + 1) + "," + char(c);
-						E[i].domain.push(s);
-					}
-				}
+				insert(graph_1, E[j]);
 				break;
 			case 3:
-				for (size_t j = 1; j <4; j++)
-				{
-					for (size_t c = 65; c <68; c += 2)
-					{
-						string s = "t" + to_string(j + 1) + "," + char(c);
-						E[i].domain.push(s);
-					}
-				}
-				break;
-			case 7:
 			case 8:
-				for (size_t j = 0; j < 4; j++)
-				{
-					for (size_t c = 65; c < 67; c++)
-					{
-						string s = "t" + to_string(j + 1) + "," + char(c);
-						E[i].domain.push(s);
-					}
-				}
-				break;
 			case 9:
-				for (size_t j = 0; j < 3; j++)
-				{
-					for (size_t c = 65; c < 67; c++)
-					{
-						string s = "t" + to_string(j + 1) + "," + char(c);
-						E[i].domain.push(s);
-					}
-				}
+				insert(graph_2, E[j]);
 				break;
-			case 10:
-				for (size_t j = 2; j < 4; j++)
-				{
-					for (size_t c = 65; c < 67; c++)
-					{
-						string s = "t" + to_string(j + 1) + "," + char(c);
-						E[i].domain.push(s);
-					}
-				}
+			case 1:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+				insert(graph_3, E[j]);
 				break;
+			}
 		}
 	}
 	
-	for (size_t i = 0; i < length; i++)
-	{
-		E[i].value_ordering = E[i].domain.size();
+	// Function to swap position of two exam elements
+	void swap(exam *a, exam *b) {
+		exam temp = *b;
+		*b = *a;
+		*a = temp;
 	}
 
-}
+	// Function to heapify the tree
+	void heapify(vector<exam> &graph, int i) {
 
+		// Find the largest among root, left child and right child
+		int largest = i,
+			left = i + 1,
+			right = i + 2;
 
-// Function to swap position of two elements
-void swap(exam *a, exam *b) {
-	exam temp = *b;
-	*b = *a;
-	*a = temp;
-}
+		if (left < graph.size() &&
+			graph[left].domain_value > graph[largest].domain_value)
+			largest = left;
+		if (right < graph.size() &&
+			graph[right].domain_value > graph[largest].domain_value)
+			largest = right;
 
-// Function to heapify the tree
-void heapify(vector<exam> &ue, int i) {
-
-	// Find the largest among root, left child and right child
-	int largest = i,
-		left = i + 1,
-		right = i + 2;
-
-	if (left < ue.size() &&
-		ue[left].value_ordering > ue[largest].value_ordering)
-		largest = left;
-	if (right < ue.size() &&
-		ue[right].value_ordering > ue[largest].value_ordering)
-		largest = right;
-
-	// Swap and continue heapifying if root is not largest
-	if (largest != i) {
-		swap(&ue[i], &ue[largest]);
-		heapify(ue, largest);
-	}
-}
-
-// Function to insert an element into the tree
-void insert(vector<exam> &ue, exam new_Exam) {
-	if (ue.size() == 0)
-		ue.push_back(new_Exam);
-	else {
-		ue.push_back(new_Exam);
-		for (int i = ue.size(); i >= 0; i--) {
-			heapify(ue, i);
+		// Swap and continue heapifying if root is not largest
+		if (largest != i) {
+			swap(&graph[i], &graph[largest]);
+			heapify(graph, largest);
 		}
 	}
-}
 
-// Function to delete an element from the tree
-void deleteNode(vector<exam> &ue, exam ex) {
-	int i;
-	for (i = 0; i < ue.size(); i++) {
-		if (ex.value_ordering == ue[i].value_ordering)
-			break;
+	// Function to insert an element into the tree
+	void insert(vector<exam> &graph, exam new_Exam) {
+		if (graph.size() == 0)
+			graph.push_back(new_Exam);
+		else {
+			graph.push_back(new_Exam);
+			for (size_t i = 0; i < graph.size(); i++) {
+				heapify(graph, i);
+			}
+		}
 	}
-	swap(&ue[i], &ue[ue.size() - 1]);
 
-	ue.pop_back();
-	for (int i = ue.size(); i >= 0; i--) {
-		heapify(ue, i);
+	// Function to delete an element from the tree
+	void deleteNode(vector<exam> &graph, exam ex) {
+		int i;
+		for (i = 0; i < graph.size(); i++) {
+			if (ex.domain_value == graph[i].domain_value)
+				break;
+		}
+		swap(&graph[i], &graph[graph.size() - 1]);
+
+		graph.pop_back();
+		for (size_t i = graph.size(); i >= 0; i--) {
+			heapify(graph, i);
+		}
 	}
-}
 
-// Print the tree
-void printArray(vector<exam> &hT) {
-	for (int i = 0; i < hT.size(); ++i)
-		cout << i << " " << hT[i].value_ordering << "\n";
-	cout << "\n";
-}
+	// Print the tree
+	void print_graph() {
+			for (size_t j = 0; j < graph_1.size(); j++) {
+				cout << graph_1[j].exam_order << "\t";
+			}
+			cout << "\n";
+			for (size_t j = 0; j < graph_2.size(); j++) {
+				cout << graph_2[j].exam_order << "\t";
+			}
+			cout << "\n";
+			for (size_t j = 0; j < graph_3.size(); j++) {
+				cout << graph_3[j].exam_order << "\t";
+			}
+	}
+};
 
 int main() {
 
 	exam E[length];
-	update_domain(E);
 	
 	for (size_t i = 0; i < length; i++)
 	{
-		print_domain(E[i], i + 1);
-		print_value(E[i], i + 1);
+		E[i].exam_order = i + 1;
 	}
 
-	vector<exam> unassigned_exam,
-		assigned_exam;
-	for (size_t i = 0; i < length; i++)
-	{
-		insert(unassigned_exam, E[i]);
-	}
-	cout << "Max-Heap array: ";
-	printArray(unassigned_exam);
+	graph graph_structure;
 
-	for (size_t i = 0; i < length; i++)
-	{
-		deleteNode(unassigned_exam, E[i]);
-	}
-	cout << "After deleting an element: ";
-
-	printArray(unassigned_exam);
-
+	graph_structure.update_queue(E);
+	
+	int e = rand() % graph_structure.graph_2.size();
+	cout << graph_structure.graph_2[e].exam_order;
 	system("pause");
 	return 0;
 }
