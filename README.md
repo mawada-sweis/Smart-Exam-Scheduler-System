@@ -50,8 +50,5 @@ Backtracking technique :
 		- Graph 2 : exam 2nd, 5th, 6th, 7th and 8th.
 	Each exam inserts the graph according to the minimum remaining value from domain.
   
-  
-  Graph 1 | Graph 2
------------- | -------------
 E1 | E2 | E3 | E4 | E5 | E6 | E7 | E8 | E9 | E10  
 6 | 6 | 6 | 6 | 6 | 12 | 12 | 12 | 8 | 8 
