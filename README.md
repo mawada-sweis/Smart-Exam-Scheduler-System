@@ -45,7 +45,7 @@ Backtracking technique :
 - Ordering : 
 	- variable ordering.
 - Structure : 
-	I split the exams according to time constraints to 2 graphs :
+	- I split the exams according to time constraints to 2 graphs :
 		- Graph 1 : exam 1st, 3rd, 4th, 9th and 10th.
 		- Graph 2 : exam 2nd, 5th, 6th, 7th and 8th.
 	Each exam inserts the graph according to the minimum remaining value from domain.
